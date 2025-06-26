@@ -1,0 +1,5 @@
+EXTRACTED TEXT (OCR):
+{ocr_text}
+
+TASK: Analyze this screenshot and describe the main activity, application, and content. Avoid speculation and focus on content over guessed activity. You provide the visual context for the OCR.
+Don't provide recommendations or other things superfluos to the purpose of describing a screenshot.

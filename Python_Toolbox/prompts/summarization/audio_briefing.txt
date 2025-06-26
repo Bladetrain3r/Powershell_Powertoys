@@ -1,0 +1,10 @@
+Summarise the feeds in brief. Plaintext only.
+
+Requirements:
+- Start with date and brief overview
+- Cover the most important stories clearly
+- Cover key topics like technology, business, politics, and international news
+- Use simple, clear language suitable for text-to-speech
+
+News Analysis:
+{news_analysis}

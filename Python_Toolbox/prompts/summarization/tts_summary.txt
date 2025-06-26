@@ -1,0 +1,6 @@
+Create a 2-3 sentence audio summary of this system analysis.
+Focus on key findings and main recommendations.
+Only the summary, no additional context or statements.
+Make it suitable for text-to-speech:
+
+{content}

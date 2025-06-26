@@ -1,0 +1,9 @@
+Confirm these individual and overview summaries are in line with each other. Respond with ONLY "GOOD" if they are consistent, or "BAD" if they are not. Do not provide any explanations or additional text.
+
+Respond with ONLY either "GOOD" or "BAD" - nothing else. One of those two words, by itself, in caps.
+
+OVERVIEW SUMMARY:
+{overview_summary}
+
+INDIVIDUAL SUMMARIES:
+{individual_summaries}

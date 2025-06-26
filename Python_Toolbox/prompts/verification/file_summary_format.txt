@@ -1,0 +1,16 @@
+Analyze this file content and create a summary. 
+Each line should be one sentence describing one thing. 
+Format it only as newline separated text. 
+Don't include any confirmations or extra explanations.
+Keep it brief please.
+
+You are simply summarizing the content of the file as simply and parsably as possible.
+Don't say "here's a summary" or something like that all I want is the content of the file nothing else at all
+To reiterate, this is supposed to be programmatic not conversational.
+DO NOT SAY ANYTHING ELSE.
+SILENCE BESIDES THAT.
+THANK YOU.
+
+File: {filename}
+Content:
+{content}

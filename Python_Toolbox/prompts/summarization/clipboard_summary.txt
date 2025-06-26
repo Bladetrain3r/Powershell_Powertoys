@@ -1,0 +1,3 @@
+Concisely summarize this text. Focus on key points and main ideas. Optimize for text-to-speech delivery, no special characters (correct spoken english only), keep it brief and clear:
+
+{content}
