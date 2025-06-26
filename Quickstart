@@ -1,0 +1,5 @@
+Windows Only.
+Scripts will have partial functionality with only some prereqs but for best outputs:
+- Lmstudio on http://localhost:1234 
+- Kokoro FastAPI running in a container or locally
+- VLC installed and launchable
