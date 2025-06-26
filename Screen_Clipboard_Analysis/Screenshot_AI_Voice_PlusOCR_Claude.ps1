@@ -1,10 +1,10 @@
 ﻿# Enhanced Visual Analysis - Context + Windows OCR + Scene Analysis + TTS
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$screenshotPath = "C:\tmp\Screenshots\screenshot_$timestamp.png"
+$screenshotPath = ".\outputs\screenshot_$timestamp.png"
 
 # Ensure directory exists
-if (!(Test-Path "C:\tmp\Screenshots")) {
-    New-Item -ItemType Directory -Path "C:\tmp\Screenshots" -Force
+if (!(Test-Path ".\outputs")) {
+    New-Item -ItemType Directory -Path ".\outputs" -Force
 }
 
 Write-Host "Screenshot capture in 5 seconds..."
@@ -224,10 +224,10 @@ try {
 }
 
 # Save all outputs
-$contextPath = "C:\tmp\Screenshots\context_$timestamp.txt"
-$ocrPath = "C:\tmp\Screenshots\ocr_$timestamp.txt"
-$analysisPath = "C:\tmp\Screenshots\analysis_$timestamp.txt"
-$summaryPath = "C:\tmp\Screenshots\summary_$timestamp.txt"
+$contextPath = ".\outputs\context_$timestamp.txt"
+$ocrPath = ".\outputs\ocr_$timestamp.txt"
+$analysisPath = ".\outputs\analysis_$timestamp.txt"
+$summaryPath = ".\outputs\summary_$timestamp.txt"
 
 @"
 CONTEXT INFORMATION - $currentTime
@@ -259,7 +259,7 @@ try {
         stream = $false
     } | ConvertTo-Json -Depth 3
     
-    $audioPath = "C:\tmp\Screenshots\latest_enhanced_analysis.mp3"
+    $audioPath = ".\outputs\latest_enhanced_analysis.mp3"
     
     $ttsHeaders = @{
         'Content-Type' = 'application/json; charset=utf-8'

@@ -5,7 +5,7 @@ param(
     [string[]]$FileExtensions = @("*.ps1", "*.py", "*.js", "*.cs", "*.java"),
     [int]$MinFunctionSize = 5,
     [float]$SimilarityThreshold = 0.7,
-    [string]$OutputDirectory = "C:\tmp\CodeSimilarity",
+    [string]$OutputDirectory = ".\outputs\CodeSimilarity",
     [int]$TrainingEpochs = 2000,
     [switch]$SkipVenvSetup,
     [switch]$Recursive
