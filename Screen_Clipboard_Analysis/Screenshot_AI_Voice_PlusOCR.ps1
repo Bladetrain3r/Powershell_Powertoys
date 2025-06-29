@@ -77,6 +77,13 @@ Write-Host "Screenshot captured: $screenshotPath"
 # WINDOWS OCR PHASE
 Write-Host "Running Windows OCR on screenshot..."
 try {
+
+    # Move screenshot to C:\Temp for Windows OCR compatibility
+    $tempPath = "C:\Temp\screenshot_$timestamp.png"
+    if (!(Test-Path "C:\Temp")) {
+        New-Item -ItemType Directory -Path "C:\Temp" -Force
+    }
+    Copy-Item -Path $screenshotPath -Destination $tempPath -Force
     # Load Windows Runtime assemblies
     Add-Type -AssemblyName System.Runtime.WindowsRuntime
     
@@ -96,7 +103,7 @@ try {
         Write-Host "OCR Engine created successfully"
         
         # Load image file
-        $getFileTask = [Windows.Storage.StorageFile]::GetFileFromPathAsync($screenshotPath)
+        $getFileTask = [Windows.Storage.StorageFile]::GetFileFromPathAsync($tempPath)
         $storageFile = $AsTask.MakeGenericMethod([Windows.Storage.StorageFile]).Invoke($null, @($getFileTask)).Result
         
         # Open file stream
@@ -138,7 +145,7 @@ try {
 }
 
 # Convert image to base64 for API
-$imageBytes = [System.IO.File]::ReadAllBytes($screenshotPath)
+$imageBytes = [System.IO.File]::ReadAllBytes($tempPath)
 $base64Image = [System.Convert]::ToBase64String($imageBytes)
 
 # CONTEXTUAL SCENE ANALYSIS
@@ -157,7 +164,7 @@ TASK: Analyze this screenshot with the above context. Focus on the content on th
 
 try {
     $analysisBody = @{
-        model = "gemma-3-4b-it-qat"
+        model = "gemma-3-12b-it-qat"
         messages = @(
             @{
                 role = "user"
@@ -202,7 +209,7 @@ try {
     $summaryPrompt = "Create a concise, natural summary suitable for text-to-speech. ONLY output the final summary text. Focus on the key points from this analysis. Use simple, spoken English without special characters or complex formatting:`n`n$fullAnalysis"
     
     $summaryBody = @{
-        model = "gemma-3-4b-it-qat"
+        model = "gemma-3-12b-it-qat"
         messages = @(
             @{
                 role = "user"

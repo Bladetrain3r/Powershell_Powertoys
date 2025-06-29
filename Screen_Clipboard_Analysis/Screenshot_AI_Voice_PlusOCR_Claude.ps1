@@ -157,7 +157,7 @@ TASK: Analyze this screenshot with the above context. Focus on the content on th
 
 try {
     $analysisBody = @{
-        model = "gemma-3-4b-it-qat"
+        model = "gemma-3-12b-it-qat"
         messages = @(
             @{
                 role = "user"
@@ -202,7 +202,7 @@ try {
     $summaryPrompt = "Create a concise, natural summary suitable for text-to-speech. ONLY output the final summary text. Focus on the key points from this analysis. Use simple, spoken English without special characters or complex formatting:`n`n$fullAnalysis"
     
     $summaryBody = @{
-        model = "gemma-3-4b-it-qat"
+        model = "gemma-3-12b-it-qat"
         messages = @(
             @{
                 role = "user"
@@ -271,7 +271,7 @@ try {
     [System.IO.File]::WriteAllBytes($audioPath, $ttsResponse.Content)
     
     Start-Sleep 1
-    Start-Process -FilePath "C:\Program Files\VideoLAN\VLC\vlc.exe" -ArgumentList "--intf dummy --play-and-exit `"$audioPath`"" -NoNewWindow -Wait
+    Start-Process -FilePath "C:\Program Files (x86)\VideoLAN\VLC\vlc.exe" -ArgumentList "--intf dummy --play-and-exit `"$audioPath`"" -NoNewWindow -Wait
     
     Write-Host "Audio analysis complete!"
     
