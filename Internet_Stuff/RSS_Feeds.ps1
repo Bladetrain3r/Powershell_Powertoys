@@ -2,8 +2,8 @@
 param(
     [string[]]$RSSFeeds = @(),
     [string]$FeedsConfigFile = "",
-    [string]$OutputDirectory = "%appdata%\Local\Powertoys\News",
-    [int]$MaxArticles = 50,
+    [string]$OutputDirectory = "C:\tmp\Powertoys\News",
+    [int]$MaxArticles = 100,
     [switch]$AudioOnly,
     [switch]$SkipAudio,
     [string]$Categories = "all" # all, tech, politics, business, etc.
@@ -182,8 +182,8 @@ function Clean-TextForAPI {
 function Invoke-NewsAPI {
     param(
         [string]$Prompt,
-        [int]$MaxTokens = 1000,
-        [float]$Temperature = 0.3
+        [int]$MaxTokens = 4000,
+        [float]$Temperature = 0.1
     )
     
     try {
@@ -277,7 +277,7 @@ foreach ($sourceGroup in $articlesBySource) {
     $headlinesText += "`n"
 }
 
-$cleanHeadlines = Clean-TextForAPI -Text $headlinesText -MaxLength 12000
+$cleanHeadlines = Clean-TextForAPI -Text $headlinesText -MaxLength 36000
 
 # Generate comprehensive news analysis
 $analysisPrompt = @"
@@ -409,7 +409,7 @@ if (!$SkipAudio) {
         Write-Host "Audio briefing saved to: $audioPath"
         
         # Check if VLC exists before trying to use it
-        $vlcPath = "C:\Program Files\VideoLAN\VLC\vlc.exe"
+        $vlcPath = "C:\Program Files (x86)\VideoLAN\VLC\vlc.exe"
         if (Test-Path $vlcPath) {
             Start-Sleep 1
             Start-Process -FilePath $vlcPath -ArgumentList "--intf dummy --play-and-exit `"$audioPath`"" -NoNewWindow -Wait
