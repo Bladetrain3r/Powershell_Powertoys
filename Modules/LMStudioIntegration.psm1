@@ -265,6 +265,12 @@ function Invoke-LMStudioTTS {
         
         $response = Invoke-ApiRequest -Uri "$($Config.TtsEndpoint)/v1/audio/speech" -Body $requestBody -Headers $headers -TimeoutSec 60
         
+        # Ensure directory exists before saving audio file
+        $directory = Split-Path -Path $OutputPath -Parent
+        if (-not (Test-Path $directory)) {
+            New-Item -Path $directory -ItemType Directory -Force | Out-Null
+        }
+        
         # Save audio file
         [System.IO.File]::WriteAllBytes($OutputPath, $response.Content)
         Write-ModuleLog -Message "TTS audio saved to: $OutputPath" -Level 'Info' -ModuleName $ModuleName
