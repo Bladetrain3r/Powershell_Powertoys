@@ -1,6 +1,0 @@
-Based on this analysis, determine the risk level.
-Respond with ONLY one of these words: LOW, MEDIUM, HIGH, CRITICAL
-No other text, no punctuation, just the risk level word.
-
-Analysis:
-{analysis}

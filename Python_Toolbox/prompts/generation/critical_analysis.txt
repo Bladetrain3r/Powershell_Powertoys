@@ -1,7 +1,0 @@
-CONTENT TYPE: {content_type}
-{analysis_instructions}
-
-{content_specific_prompt}
-
-{content_label}:
-{content}

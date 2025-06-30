@@ -1,9 +1,0 @@
-Analyze this file for security and code quality risks. Provide assessment in EXACTLY this format, nothing else, no other words, and keep each section concise:
-
-RISK_LEVEL: [LOW/MEDIUM/HIGH/CRITICAL]
-SECURITY_ISSUES: [Brief description of security concerns like hardcoded passwords, SQL injection risks, etc.]
-QUALITY_ISSUES: [Brief description of code quality issues like hardcoded paths, poor variable naming, etc.]
-BEST_PRACTICE_VIOLATIONS: [Brief description of best practice violations like missing error handling, poor structure, etc.]
-
-File: {filename}
-Content: {content}

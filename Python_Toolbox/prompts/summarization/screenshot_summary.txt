@@ -1,3 +1,0 @@
-Summarize this activity in 1-2 concise sentences. Focus on what the user was doing or viewing. Be specific about applications, content, or tasks:
-
-{content}
