@@ -6,7 +6,74 @@ Core data models for chat application
 import json
 from pathlib import Path
 from datetime import datetime
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
+from enum import Enum
+
+class OutputFormat(Enum):
+    """Standard output formats for commands"""
+    TEXT = "text"
+    DATA = "data"
+    TABLE = "table"
+    STATUS = "status"
+    ERROR = "error"
+    HELP = "help"
+
+class CommandResult:
+    """Standardized result from any command/operation"""
+    def __init__(self, 
+                 success: bool = True,
+                 format: OutputFormat = OutputFormat.TEXT,
+                 content: Any = None,
+                 error: Optional[str] = None,
+                 code: Optional[str] = None,
+                 suggestion: Optional[str] = None):
+        self.success = success
+        self.format = format
+        self.content = content
+        self.error = error
+        self.code = code
+        self.suggestion = suggestion
+    
+    def to_dict(self) -> Dict:
+        result = {
+            "success": self.success,
+            "format": self.format.value
+        }
+        
+        if self.success:
+            if self.format == OutputFormat.TEXT:
+                result["content"] = self.content
+            elif self.format == OutputFormat.TABLE:
+                result["headers"] = self.content.get("headers", [])
+                result["rows"] = self.content.get("rows", [])
+            elif self.format == OutputFormat.DATA:
+                result["data"] = self.content
+            elif self.format == OutputFormat.STATUS:
+                result["message"] = self.content.get("message", "")
+                result["details"] = self.content.get("details", {})
+        else:
+            result["error"] = self.error
+            if self.code:
+                result["code"] = self.code
+            if self.suggestion:
+                result["suggestion"] = self.suggestion
+        
+        return result
+    
+    @classmethod
+    def success_text(cls, text: str) -> 'CommandResult':
+        """Create a successful text result"""
+        return cls(success=True, format=OutputFormat.TEXT, content=text)
+    
+    @classmethod
+    def success_data(cls, data: Dict) -> 'CommandResult':
+        """Create a successful data result"""
+        return cls(success=True, format=OutputFormat.DATA, content=data)
+    
+    @classmethod
+    def error(cls, error: str, code: Optional[str] = None, suggestion: Optional[str] = None) -> 'CommandResult':
+        """Create an error result"""
+        return cls(success=False, format=OutputFormat.ERROR, error=error, code=code, suggestion=suggestion)
 
 class Message:
     """Single message in conversation"""
@@ -63,12 +130,12 @@ class Conversation:
         }
     
     def save(self, path: Path):
-        with open(path, 'w') as f:
-            json.dump(self.to_dict(), f, indent=2)
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(self.to_dict(), f, indent=2, ensure_ascii=False)
     
     @classmethod
     def load(cls, path: Path) -> 'Conversation':
-        with open(path) as f:
+        with open(path, encoding='utf-8') as f:
             data = json.load(f)
         
         conv = cls()
@@ -88,7 +155,7 @@ class Config:
     
     def _load(self) -> Dict:
         if self.path.exists():
-            with open(self.path) as f:
+            with open(self.path, encoding='utf-8') as f:
                 return json.load(f)
         return {}
     
@@ -100,8 +167,8 @@ class Config:
         self.save()
     
     def save(self):
-        with open(self.path, 'w') as f:
-            json.dump(self.data, f, indent=2)
+        with open(self.path, 'w', encoding='utf-8') as f:
+            json.dump(self.data, f, indent=2, ensure_ascii=False)
     
     @classmethod
     def get_default_config(cls) -> Dict:

@@ -10,6 +10,8 @@ from pathlib import Path
 
 import httpx
 
+from .models import CommandResult, OutputFormat
+
 # Optional clipboard support
 try:
     import pyperclip
@@ -24,23 +26,70 @@ class APIController:
         self.timeout = timeout
         self.api_url = f"{base_url}/v1/chat/completions"
     
-    def test_connection(self) -> bool:
+    def test_connection(self) -> CommandResult:
         """Test if API is accessible"""
         try:
             with httpx.Client(timeout=5.0) as client:
                 response = client.get(f"{self.base_url}/v1/models")
-                return response.status_code == 200
-        except:
-            return False
+                if response.status_code == 200:
+                    return CommandResult.success_text(f"Connected to {self.base_url}")
+                else:
+                    return CommandResult.error(
+                        f"API returned status {response.status_code}",
+                        code="API_ERROR",
+                        suggestion="Check if LM Studio is running and accessible"
+                    )
+        except httpx.TimeoutException:
+            return CommandResult.error(
+                "Connection timeout",
+                code="TIMEOUT",
+                suggestion="Check if the API URL is correct and server is responding"
+            )
+        except httpx.ConnectError:
+            return CommandResult.error(
+                f"Cannot connect to {self.base_url}",
+                code="CONNECTION_ERROR",
+                suggestion="Verify LM Studio is running on the correct port"
+            )
+        except Exception as e:
+            return CommandResult.error(
+                f"Connection failed: {str(e)}",
+                code="UNKNOWN_ERROR",
+                suggestion="Check network connectivity and API configuration"
+            )
     
-    def get_models(self) -> Optional[List[Dict]]:
+    def get_models(self) -> CommandResult:
         """Fetch available models"""
         try:
             with httpx.Client(timeout=5.0) as client:
                 response = client.get(f"{self.base_url}/v1/models")
-                return response.json().get("data", [])
-        except:
-            return None
+                if response.status_code == 200:
+                    models = response.json().get("data", [])
+                    return CommandResult.success_data({"models": models})
+                else:
+                    return CommandResult.error(
+                        f"Failed to fetch models: HTTP {response.status_code}",
+                        code="API_ERROR",
+                        suggestion="Check if LM Studio has models loaded"
+                    )
+        except httpx.TimeoutException:
+            return CommandResult.error(
+                "Request timeout while fetching models",
+                code="TIMEOUT",
+                suggestion="Try again or check server responsiveness"
+            )
+        except httpx.ConnectError:
+            return CommandResult.error(
+                f"Cannot connect to {self.base_url}",
+                code="CONNECTION_ERROR",
+                suggestion="Verify LM Studio is running"
+            )
+        except Exception as e:
+            return CommandResult.error(
+                f"Error fetching models: {str(e)}",
+                code="UNKNOWN_ERROR",
+                suggestion="Check API configuration and connectivity"
+            )
     
     def stream_completion(self, messages: List[Dict], config: Dict) -> Generator[str, None, None]:
         """Stream completion from API"""
@@ -72,14 +121,30 @@ class APIController:
 class ClipboardController:
     """Handles clipboard operations"""
     @staticmethod
-    def get_clipboard() -> Optional[str]:
+    def get_clipboard() -> CommandResult:
         if not HAS_CLIPBOARD:
-            return None
+            return CommandResult.error(
+                "Clipboard functionality not available",
+                code="NO_CLIPBOARD",
+                suggestion="Install pyperclip: pip install pyperclip"
+            )
         
         try:
-            return pyperclip.paste()
-        except Exception:
-            return None
+            content = pyperclip.paste()
+            if content:
+                return CommandResult.success_text(content)
+            else:
+                return CommandResult.error(
+                    "Clipboard is empty",
+                    code="EMPTY_CLIPBOARD",
+                    suggestion="Copy some text to clipboard first"
+                )
+        except Exception as e:
+            return CommandResult.error(
+                f"Failed to access clipboard: {str(e)}",
+                code="CLIPBOARD_ERROR",
+                suggestion="Check clipboard permissions and try again"
+            )
     
     @staticmethod
     def is_available() -> bool:
@@ -88,16 +153,56 @@ class ClipboardController:
 class FileController:
     """Handles file operations"""
     @staticmethod
-    def read_file(path: Path) -> Optional[str]:
+    def read_file(path: Path) -> CommandResult:
         """Read file content"""
         try:
-            return path.read_text()
+            # Check if path exists
+            if not path.exists():
+                return CommandResult.error(
+                    f"File not found: {path}",
+                    code="FILE_NOT_FOUND",
+                    suggestion="Check the file path and try again"
+                )
+            
+            # Check if it's a file (not directory)
+            if not path.is_file():
+                return CommandResult.error(
+                    f"Path is not a file: {path}",
+                    code="NOT_A_FILE",
+                    suggestion="Provide a path to a file, not a directory"
+                )
+            
+            # Try to read with UTF-8 encoding
+            try:
+                content = path.read_text(encoding='utf-8')
+                return CommandResult.success_text(content)
+            except UnicodeDecodeError:
+                # Try with different encoding
+                try:
+                    content = path.read_text(encoding='latin-1')
+                    return CommandResult.success_text(content)
+                except UnicodeDecodeError:
+                    return CommandResult.error(
+                        f"Cannot decode file: {path}",
+                        code="ENCODING_ERROR",
+                        suggestion="File may be binary or use unsupported encoding"
+                    )
+        
+        except PermissionError:
+            return CommandResult.error(
+                f"Permission denied: {path}",
+                code="PERMISSION_ERROR",
+                suggestion="Check file permissions or run with appropriate privileges"
+            )
         except Exception as e:
-            print(f"Error reading file: {e}")
-            return None
+            return CommandResult.error(
+                f"Error reading file: {str(e)}",
+                code="FILE_ERROR",
+                suggestion="Check file path and permissions"
+            )
     
     @staticmethod
-    def detect_language(path: Path) -> Optional[str]:
+    def detect_language(path: Path) -> CommandResult:
         """Detect programming language from file extension"""
         extensions = {
             '.py': 'python',
@@ -124,10 +229,19 @@ class FileController:
         
         # Check exact filename first
         if path.name in extensions:
-            return extensions[path.name]
+            language = extensions[path.name]
+            return CommandResult.success_data({"language": language, "source": "filename"})
         
         # Then check extension
-        return extensions.get(path.suffix.lower())
+        language = extensions.get(path.suffix.lower())
+        if language:
+            return CommandResult.success_data({"language": language, "source": "extension"})
+        
+        return CommandResult.error(
+            f"Unknown file type: {path.suffix or 'no extension'}",
+            code="UNKNOWN_FILETYPE",
+            suggestion="Language detection based on file extension only"
+        )
 
 class SessionController:
     """Handles session management"""
