@@ -1,0 +1,9 @@
+
+Pychat_Experimental/lmchat/__pycache__/
+Pychat_Experimental/lmchat/core/__pycache__/__init__.cpython-310.pyc
+Pychat_Experimental/lmchat/core/__pycache__/chat.cpython-310.pyc
+Pychat_Experimental/lmchat/core/__pycache__/controllers.cpython-310.pyc
+Pychat_Experimental/lmchat/core/__pycache__/models.cpython-310.pyc
+Pychat_Experimental/lmchat/features/__pycache__/__init__.cpython-310.pyc
+Pychat_Experimental/lmchat/features/__pycache__/clipboard.cpython-310.pyc
+Pychat_Experimental/lmchat/features/__pycache__/file_input.cpython-310.pyc

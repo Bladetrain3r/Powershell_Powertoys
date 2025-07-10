@@ -1,0 +1,14 @@
+# Pychat_Experimental - Requirements
+# LM Studio Chat Client Dependencies
+
+# Core HTTP client for API communication
+httpx>=0.25.0
+
+# Clipboard operations (optional but recommended)
+pyperclip>=1.8.2
+
+# Development dependencies (uncomment for development)
+# pytest>=7.0.0
+# pytest-asyncio>=0.21.0
+# black>=23.0.0
+# flake8>=6.0.0
